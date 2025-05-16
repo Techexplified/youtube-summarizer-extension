@@ -13,7 +13,6 @@
     {
       "matches": ["https://www.youtube.com/watch*"],
       "js": ["contentScript.js"],
-      "css":["index.css"],
       "run_at": "document_idle"
     }
   ],

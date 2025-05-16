@@ -1,11 +1,13 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
+import "./index.css"
 
 function Popup() {
   return (
-    <div style={{ padding: '1rem' }}>
-      <h2 className='underline'>YouTube Summarizer</h2>
-      <button onClick={() => alert('Clicked!')}>Summarize</button>
+    <div className='flex flex-col gap-2 items-center'>
+      <h2 className='underline text-center font-semibold'>YouTube Summarizer</h2>
+      <button className='border-1 border-black p-2 rounded ' onClick={() => alert('Clicked!')}>Summarize</button>
+      <button className='border-1 border-black p-2 rounded ' onClick={() => alert('Clicked!')}>Toggle</button>
     </div>
   );
 }

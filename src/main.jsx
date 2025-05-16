@@ -1,14 +1,14 @@
 import React, { StrictMode } from 'react';
 import ReactDOM, { createRoot } from 'react-dom/client';
 import App from './App.jsx';
-import "../public/index.css";
+import "./index.css"
 
 // Attach to window
 window.mountReactApp = function () {
   function tryMount() {
     const container = document.querySelector('#panels');
     if (!container) {
-      console.log('❗️#panels not found, retrying in 500ms...');
+      console.log('#panels not found, retrying in 500ms...');
       setTimeout(tryMount, 500);
       return;
     }
@@ -22,7 +22,7 @@ window.mountReactApp = function () {
 
     const root = ReactDOM.createRoot(mountNode);
     root.render(<App />);
-    console.log('✅ React app mounted!');
+    console.log('React app mounted!');
   }
 
   tryMount();

@@ -1,15 +1,26 @@
-console.log("Hello from content script!");
+const cssHref = chrome.runtime.getURL('assets/main.css');
 
-// Load your bundled React app
-// Dynamically import your React bundle and call the mount function
-import(chrome.runtime.getURL('assets/main.js'))
-  .then(() => {
-    if (window.mountReactApp) {
-      window.mountReactApp();
-      console.log('✅ React component injected');
-    } else {
-      console.error('❌ mountReactApp not found on window');
-    }
-  })
-  .catch((err) => console.error('❌ Failed to inject React app:', err));
+const link = document.createElement('link');
+link.rel = 'stylesheet';
+link.href = cssHref;
 
+link.onload = () => {
+  console.log('Tailwind CSS loaded');
+
+  import(chrome.runtime.getURL('assets/main.js'))
+    .then(() => {
+      if (window.mountReactApp) {
+        window.mountReactApp();
+        console.log('React app mounted');
+      } else {
+        console.error('mountReactApp not found');
+      }
+    })
+    .catch((err) => console.error('Failed to load React app:', err));
+};
+
+link.onerror = () => {
+  console.error('Failed to load Tailwind CSS:', cssHref);
+};
+
+document.head.appendChild(link);
