@@ -3,16 +3,29 @@
   "name": "Youtube Summerizer",
   "version": "1.0.0",
   "description": "A basic example extension with only required keys",
-  "permissions": ["scripting", "activeTab"],
-  "host_permissions": ["*://www.youtube.com/*"],
+  "permissions": [
+    "scripting",
+    "activeTab",
+    "storage"
+  ],
+  "host_permissions": [
+    "*://www.youtube.com/*"
+  ],
   "action": {
     "default_icon": "youtube.png",
     "default_popup": "popup.html"
   },
+   "background": {
+    "service_worker": "background.js"
+  },
   "content_scripts": [
     {
-      "matches": ["https://www.youtube.com/watch*"],
-      "js": ["contentScript.js"],
+      "matches": [
+        "https://www.youtube.com/watch*"
+      ],
+      "js": [
+        "contentScript.js"
+      ],
       "run_at": "document_idle"
     }
   ],
@@ -21,8 +34,12 @@
   },
   "web_accessible_resources": [
     {
-      "resources": ["/assets/*"],
-      "matches": ["https://www.youtube.com/*"]
+      "resources": [
+        "/assets/*"
+      ],
+      "matches": [
+        "https://www.youtube.com/*"
+      ]
     }
   ]
 }
