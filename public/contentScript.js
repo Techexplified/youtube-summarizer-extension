@@ -1,93 +1,74 @@
-// const cssHref = chrome.runtime.getURL('assets/main.css');
-
-// const link = document.createElement('link');
-// link.rel = 'stylesheet';
-// link.href = cssHref;
-
-// link.onload = () => {
-//   console.log('Tailwind CSS loaded');
-
-//   import(chrome.runtime.getURL('assets/main.js'))
-//     .then(() => {
-//       if (window.mountReactApp) {
-//         window.mountReactApp();
-//         console.log('React app mounted');
-//       } else {
-//         console.error('mountReactApp not found');
-//       }
-//     })
-//     .catch((err) => console.error('Failed to load React app:', err));
-// };
-
-// link.onerror = () => {
-//   console.error('Failed to load Tailwind CSS:', cssHref);
-// };
-
-// document.head.appendChild(link);
-
 const cssHref = chrome.runtime.getURL('assets/main.css');
 const scriptHref = chrome.runtime.getURL('assets/main.js');
 
 let isMounted = false;
-let mountNode = null;
+let observer = null;
 
-// Load Tailwind CSS
 const link = document.createElement('link');
 link.rel = 'stylesheet';
 link.href = cssHref;
-
-link.onload = () => {
-  console.log('✅ Tailwind CSS loaded');
-
-  // Load React app if showReactApp is true in storage
-  chrome.storage.local.get(['showReactApp'], (result) => {
-    if (result.showReactApp) {
-      loadReactApp();
-    }
-  });
-};
-
-link.onerror = () => {
-  console.error('❌ Failed to load Tailwind CSS:', cssHref);
-};
-
 document.head.appendChild(link);
 
-// Load and mount React app
-function loadReactApp() {
-  if (isMounted) return;
+link.onload = () => {
+  console.log('Tailwind CSS loaded');
 
-  import(scriptHref)
-    .then(() => {
-      if (window.mountReactApp) {
-        window.mountReactApp();
-        isMounted = true;
-        console.log('✅ React app mounted');
-      } else {
-        console.log('❌ mountReactApp not found on window');
-      }
-    })
-    .catch((err) => console.error('❌ Failed to load React app:', err));
+  // Immediately try mounting once, in case DOM is ready
+  chrome.storage.local.get(['showReactApp'], (result) => {
+    if (result.showReactApp) {
+      tryMountReactApp();
+    }
+  });
+
+  observeDOMChanges();
+};
+
+function tryMountReactApp() {
+  const container = document.querySelector('#panels');
+  if (container && !document.getElementById('explified-extension')) {
+    import(scriptHref)
+      .then(() => {
+        if (window.mountReactApp) {
+          window.mountReactApp();
+          isMounted = true;
+          console.log('extension app mounted');
+        } else {
+          console.error('extension not found');
+        }
+      })
+      .catch(err => console.error('Failed to load:', err));
+  }
 }
 
-// Unmount React app (removes it from the DOM)
 function unmountReactApp() {
-  const existing = document.getElementById('my-react-popup');
+  const existing = document.getElementById('explified-extension');
   if (existing) {
     existing.remove();
-    console.log('🧹 React app unmounted');
+    console.log('React app unmounted');
   }
   isMounted = false;
 }
 
-// 🔁 Listen for messages from background.js
+function observeDOMChanges() {
+  if (observer) observer.disconnect();
+
+  observer = new MutationObserver(() => {
+    chrome.storage.local.get(['showReactApp'], (result) => {
+      if (result.showReactApp && !document.getElementById('explified-extension')) {
+        tryMountReactApp();
+      }
+    });
+  });
+
+  observer.observe(document.body, { childList: true, subtree: true });
+}
+
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   if (message.action === 'toggleReactApp') {
-    // console.log(message.show);
     if (message.show) {
-      loadReactApp();
+      tryMountReactApp();
     } else {
       unmountReactApp();
     }
   }
 });
+

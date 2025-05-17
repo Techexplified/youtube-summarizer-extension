@@ -4,6 +4,7 @@ console.log("loaded background.js");
 try {
   chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     if (message.action === 'toggleReactApp') {
+      // console.log(message);
       // Find active YouTube tab
       chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
         const activeTab = tabs[0];
@@ -19,3 +20,5 @@ try {
 } catch (error) {
   console.log(error);
 }
+
+
